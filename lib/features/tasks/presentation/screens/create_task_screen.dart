@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vpay/features/tasks/presentation/providers/tasks_provider.dart';
 import 'package:vpay/shared/models/task_model.dart';
-import 'package:vpay/shared/widgets/loading_button.dart';
-import 'package:vpay/features/auth/presentation/providers/auth_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class CreateTaskScreen extends ConsumerStatefulWidget {
   const CreateTaskScreen({super.key});
@@ -13,130 +12,166 @@ class CreateTaskScreen extends ConsumerStatefulWidget {
 }
 
 class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
-  final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _amountController = TextEditingController();
-  DateTime _deadline = DateTime.now().add(const Duration(days: 1));
-
-  @override
-  Widget build(BuildContext context) {
-    final tasksState = ref.watch(tasksProvider);
-
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create New Task'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              TextFormField(
-                controller: _titleController,
-                decoration: const InputDecoration(
-                  labelText: 'Task Title',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter a title';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: const InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(),
-                ),
-                maxLines: 3,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter a description';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _amountController,
-                decoration: const InputDecoration(
-                  labelText: 'Amount (₹)',
-                  border: OutlineInputBorder(),
-                  prefixText: '₹ ',
-                ),
-                keyboardType: TextInputType.number,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return 'Please enter an amount';
-                  }
-                  final amount = double.tryParse(value!);
-                  if (amount == null || amount <= 0) {
-                    return 'Please enter a valid amount';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              ListTile(
-                title: const Text('Deadline'),
-                subtitle: Text(_deadline.toString().split('.').first),
-                trailing: const Icon(Icons.calendar_today),
-                onTap: () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: _deadline,
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime.now().add(const Duration(days: 90)),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      _deadline = date;
-                    });
-                  }
-                },
-              ),
-              const SizedBox(height: 24),
-              LoadingButton(
-                isLoading: tasksState.isLoading,
-                text: 'Create Task',
-                onPressed: _submitTask,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _submitTask() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      final task = TaskModel(
-        id: DateTime.now().toString(), // Will be replaced by Supabase
-        title: _titleController.text,
-        description: _descriptionController.text,
-        creatorId: ref.read(authProvider).user!.id,
-        amount: double.parse(_amountController.text),
-        createdAt: DateTime.now(),
-        deadline: _deadline,
-      );
-
-      await ref.read(tasksProvider.notifier).createTask(task);
-      if (mounted) {
-        Navigator.pop(context);
-      }
-    }
-  }
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+  DateTime? _selectedDeadline;
+  final List<String> _skills = [];
+  final _skillController = TextEditingController();
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
     _amountController.dispose();
+    _skillController.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Create Task'),
+      ),
+      body: SingleChildScrollView(
+        child: _isLoading
+            ? const Center(
+                child: CircularProgressIndicator(),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextFormField(
+                        controller: _titleController,
+                        decoration: const InputDecoration(
+                          labelText: 'Title',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a title';
+                          }
+                          if (value.length < 3) {
+                            return 'The title must be at least 3 characters';
+                          }
+                          if (value.length > 50) {
+                            return 'The title must be less than 50 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _descriptionController,
+                        decoration: const InputDecoration(
+                          labelText: 'Description',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a description';
+                          }
+                          if (value.length < 5) {
+                            return 'The description must be at least 5 characters';
+                          }
+                          if (value.length > 100) {
+                            return 'The description must be less than 100 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _amountController,
+                        decoration: const InputDecoration(
+                          labelText: 'Amount',
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter an amount';
+                          }
+                          if (double.tryParse(value) == null) {
+                            return 'Please enter a valid number';
+                          }
+                          if (double.parse(value) <= 0) {
+                            return 'Please enter a value greater than 0';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextField(
+                        controller: _skillController,
+                        decoration: const InputDecoration(
+                          labelText: 'Skill',
+                        ),
+                        onSubmitted: (value) {
+                          setState(() {
+                            _skills.add(value);
+                          });
+                          _skillController.clear();
+                        },
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+                            if (_skills.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content:
+                                        Text('Please add at least one skill')),
+                              );
+                              return;
+                            }
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            try {
+                              final task = Task(
+                                // ignore: prefer_const_constructors
+                                id: Uuid().v4(),
+                                title: _titleController.text,
+                                description: _descriptionController.text,
+                                amount: double.parse(_amountController.text),
+                                deadline: _selectedDeadline!,
+                                creatorId: '',
+                                createdAt: DateTime.now(),
+                                skills: _skills,
+                                latitude: 0,
+                                longitude: 0,
+                              );
+                              await ref
+                                  .read(tasksProvider.notifier)
+                                  .createTask(task);
+                            } finally {
+                              setState(() {
+                                _isLoading = false;
+                              });
+                            }
+                          }
+                        },
+                        child: const Text('Create Task'),
+                      ),
+                      const SizedBox(height: 20),
+                      const Text('Skills:'),
+                      Wrap(
+                        children: _skills
+                            .map((skill) => Chip(label: Text(skill)))
+                            .toList(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+      ),
+    );
   }
 }

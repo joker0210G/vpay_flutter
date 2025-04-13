@@ -1,61 +1,57 @@
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class NotificationService {
-  final FirebaseMessaging _messaging;
-  final FlutterLocalNotificationsPlugin _localNotifications;
+  final FlutterLocalNotificationsPlugin localNotifications;
+  final RealtimeChannel _channel;
 
   NotificationService({
-    required FirebaseMessaging messaging,
-    required FlutterLocalNotificationsPlugin localNotifications,
-  })  : _messaging = messaging,
-        _localNotifications = localNotifications;
+    required this.localNotifications,
+  }) : _channel = Supabase.instance.client.channel('messages');
 
   Future<void> initialize() async {
-    // Request permission
-    await _messaging.requestPermission();
-
+    // Request local notifications permissions
+    await localNotifications
+        .resolvePlatformSpecificImplementation<
+            IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
     // Initialize local notifications
-    await _localNotifications.initialize(
+    await localNotifications.initialize(
       const InitializationSettings(
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
         iOS: DarwinInitializationSettings(),
       ),
     );
-
-    // Handle background messages
-    FirebaseMessaging.onBackgroundMessage(_handleBackgroundMessage);
-
-    // Handle foreground messages
-    FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+    // Initialize Supabase listener
+    _listenForNewMessages();
   }
 
-  static Future<void> _handleBackgroundMessage(RemoteMessage message) async {
-    // Handle background message
+  void _listenForNewMessages() {
+    _channel.onPostgresChanges(
+      event: PostgresChangeEvent.insert,
+      schema: 'public',
+      table: 'messages',
+      callback: (payload) {
+        _showNewMessageNotification();
+      },
+    ).subscribe();
   }
 
-  Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    // Show local notification
-    await _localNotifications.show(
-      message.hashCode,
-      message.notification?.title,
-      message.notification?.body,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'default_channel',
-          'Default Channel',
-          importance: Importance.high,
-        ),
-        iOS: DarwinNotificationDetails(),
-      ),
-    );
+  Future<void> _showNewMessageNotification() async {
+    const AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails('channelId', 'channelName',
+            channelDescription: 'your channel description',
+            importance: Importance.max,
+            priority: Priority.high,
+            ticker: 'ticker');
+    const NotificationDetails notificationDetails =
+        NotificationDetails(android: androidNotificationDetails);
+    await localNotifications.show(
+        0, 'New Message', 'You have a new message!', notificationDetails);
   }
 
-  Future<void> subscribeToTopic(String topic) async {
-    await _messaging.subscribeToTopic(topic);
-  }
-
-  Future<void> unsubscribeFromTopic(String topic) async {
-    await _messaging.unsubscribeFromTopic(topic);
-  }
 }

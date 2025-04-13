@@ -6,7 +6,6 @@ import 'package:vpay/features/tasks/presentation/screens/task_list_screen.dart';
 import 'package:vpay/features/auth/presentation/providers/auth_provider.dart';
 import 'package:vpay/features/notifications/presentation/screens/notification_screen.dart';
 import 'package:vpay/shared/theme/app_theme.dart';
-import 'package:vpay/features/router/router.dart';
 
 final routerProvider = Provider<GoRouter>((ref) {
   final authState = ref.watch(authProvider);

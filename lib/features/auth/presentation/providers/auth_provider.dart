@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:vpay/features/auth/data/auth_repository.dart';
 import 'package:vpay/shared/models/user_model.dart';
 
@@ -13,6 +14,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   AuthNotifier(this._repository) : super(AuthState.initial()) {
     _init();
   }
+
 
   Future<void> _init() async {
     final user = await _repository.getCurrentUser();
@@ -31,8 +33,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (user != null) {
         state = AuthState.authenticated(user);
       }
-    } catch (e) {
-      state = AuthState.error(e.toString());
+    } catch (e) {     
+       if (e is AuthException && e.message.contains('duplicate key value violates unique constraint')) {
+        state = AuthState.error("The user already exists");
+      }else{
+        state = AuthState.error("Error in login, please check your credentials");
+      }
     }
   }
 
@@ -45,8 +51,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
         fullName: fullName,
       );
       await signIn(email, password);
-    } catch (e) {
-      state = AuthState.error(e.toString());
+    } catch (e) {   
+        if (e is AuthException && e.message.contains('duplicate key value violates unique constraint')) {
+        state = AuthState.error("The email is already registered");
+      }else{
+        state = AuthState.error("Error in register, please try again");
+      }
     }
   }
 
@@ -54,8 +64,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
     try {
       await _repository.signOut();
       state = AuthState.unauthenticated();
+    } catch (e) {   
+      state = AuthState.error("Error in logout, please try again");
+    }
+  }
+
+   Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _repository.sendPasswordResetEmail(email);
     } catch (e) {
-      state = AuthState.error(e.toString());
+      state = AuthState.error("Error sending password reset email");
+    }
+  }
+
+  Future<void> signInWithGoogle() async {
+    try {
+       await _repository.signInWithGoogle();
+    } catch (e) {
+        state = AuthState.error("Error in login with Google, please try again");
+    }
+  }
+
+  Future<void> signInWithFacebook() async {
+    try {
+        await _repository.signInWithFacebook();
+    } catch (e) {
+         state = AuthState.error("Error in login with Facebook, please try again");
     }
   }
 }

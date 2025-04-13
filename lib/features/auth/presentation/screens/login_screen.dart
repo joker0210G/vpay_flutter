@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vpay/features/auth/presentation/providers/auth_provider.dart';
 import 'package:vpay/shared/theme/app_colors.dart';
@@ -18,6 +22,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print('test');
     final authState = ref.watch(authProvider);
 
     return Scaffold(
@@ -31,7 +36,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   Container(
                     color: AppColors.primaryDark,
                   ),
-                  const Positioned(
+                  Positioned(
                     left: 75,
                     top: 0,
                     child: Image.asset(
@@ -53,7 +58,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             topLeft: Radius.circular(206),
                           ),
                         ),
-                      ),
+                      ),                    
                       child: Form(
                         key: _formKey,
                         child: Padding(
@@ -61,7 +66,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              Text(
+                              const Text(
                                 'Login\nWelcome back!',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -76,10 +81,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 controller: _emailController,
                                 decoration: InputDecoration(
                                   hintText: 'Enter Your Username / Email',
-                                  hintStyle: TextStyle(
+                                  hintStyle: const TextStyle(
                                     color: AppColors.black70,
                                     fontSize: 12,
-                                    fontFamily: 'Poppins',
+                                     fontFamily: 'Poppins',                                    
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -94,7 +99,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 obscureText: _obscurePassword,
                                 decoration: InputDecoration(
                                   hintText: 'Enter Your Password',
-                                  hintStyle: TextStyle(
+                                  hintStyle: const TextStyle(
                                     color: AppColors.black70,
                                     fontSize: 12,
                                     fontFamily: 'Poppins',
@@ -134,7 +139,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 ),
                               ),
                               const SizedBox(height: 20),
-                              const Text(
+                               const Text(
                                 'Sign in',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
@@ -149,7 +154,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Text(
+                                  const Text(
                                     " Don't have an account? ",
                                     style: TextStyle(
                                       color: AppColors.black80,
@@ -159,7 +164,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ),
                                   ),
                                   TextButton(
-                                    onPressed: _navigateToRegister,
+                                    onPressed: _navigateToRegister,                                    
                                     child: const Text(
                                       'Signup',
                                       style: TextStyle(
@@ -176,10 +181,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               Row(
                                 children: [
                                   Expanded(child: _buildDivider()),
-                                  const Padding(
+                                  const Padding(                                    
                                     padding: EdgeInsets.symmetric(horizontal: 16),
                                     child: Text(
-                                      'Or',
+                                      'Or',                                      
                                       style: TextStyle(
                                         fontFamily: 'Poppins',
                                         fontSize: 14,
@@ -225,7 +230,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               right: 20,
               child: Container(
                 padding: const EdgeInsets.all(16),
-                color: Colors.red.withOpacity(0.8),
+                color: Colors.red.withAlpha((0.8 * 255).round()),
                 child: Text(
                   authState.error!,
                   style: const TextStyle(color: Colors.white),
@@ -273,7 +278,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   void _navigateToRegister() {
-    context.push('/register');
+    context.go('/register');
   }
 
   void _handleGoogleLogin() {

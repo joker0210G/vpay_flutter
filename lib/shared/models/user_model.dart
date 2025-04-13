@@ -5,6 +5,7 @@ class UserModel {
   final String? avatarUrl;
   final String? phone;
   final bool isVerified;
+  final List<String>? skills;
 
   UserModel({
     required this.id,
@@ -13,6 +14,7 @@ class UserModel {
     this.avatarUrl,
     this.phone,
     this.isVerified = false,
+    this.skills,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
@@ -22,6 +24,7 @@ class UserModel {
       fullName: json['full_name'],
       avatarUrl: json['avatar_url'],
       phone: json['phone'],
+      skills: json['skills'] == null ? [] : List<String>.from(json['skills']),
       isVerified: json['is_verified'] ?? false,
     );
   }
@@ -33,6 +36,7 @@ class UserModel {
       'full_name': fullName,
       'avatar_url': avatarUrl,
       'phone': phone,
+      'skills': skills,
       'is_verified': isVerified,
     };
   }

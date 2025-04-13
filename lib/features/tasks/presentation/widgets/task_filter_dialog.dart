@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:vpay/features/tasks/domain/task_filter.dart';
 import 'package:vpay/shared/models/task_model.dart';
 
 class TaskFilterDialog extends StatefulWidget {
@@ -18,6 +17,8 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
   late TaskStatus? _selectedStatus;
   final _minAmountController = TextEditingController();
   final _maxAmountController = TextEditingController();
+  final List<String> _skills = [];
+  String _newSkill = '';
 
   @override
   void initState() {
@@ -52,6 +53,57 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
             },
           ),
           const SizedBox(height: 16),
+          Wrap(
+            spacing: 8.0,
+            children: _skills.map((skill) => Chip(
+              label: Text(skill),
+              onDeleted: () {
+                setState(() {
+                  _skills.remove(skill);
+                });
+              },
+            )).toList(),
+          ),
+          const SizedBox(height: 16),
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: 'Add Skill',
+              suffixIcon: IconButton(
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('Add Skill'),
+                        content: TextFormField(
+                          onChanged: (value) => _newSkill = value,
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Cancel'),
+                          ),
+                                                      TextButton(
+                                onPressed: () {
+                                  if (_newSkill.isNotEmpty) {
+                                    setState(() {
+                                      _skills.add(_newSkill);
+                                      _newSkill = '';
+                                    });
+                                  }
+                                  Navigator.pop(context);
+                                },
+                            child: const Text('Apply'),
+                          )
+                        ],
+                      );
+                    });
+                },
+              )
+            ),
+          ),
+          const SizedBox(height: 16),
           TextFormField(
             controller: _minAmountController,
             decoration: const InputDecoration(
@@ -82,6 +134,7 @@ class _TaskFilterDialogState extends State<TaskFilterDialog> {
               status: _selectedStatus,
               minAmount: double.tryParse(_minAmountController.text),
               maxAmount: double.tryParse(_maxAmountController.text),
+              skills: _skills,
             );
             Navigator.pop(context, filter);
           },

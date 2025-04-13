@@ -7,6 +7,7 @@ class TaskFilter {
   final double? latitude;
   final double? longitude;
   final double? radiusKm;
+  final List<String>? skills;
 
   const TaskFilter({
     this.status,
@@ -14,6 +15,7 @@ class TaskFilter {
     this.maxAmount,
     this.latitude,
     this.longitude,
+    this.skills,
     this.radiusKm,
   });
 
@@ -24,6 +26,7 @@ class TaskFilter {
     double? latitude,
     double? longitude,
     double? radiusKm,
+    List<String>? skills
   }) {
     return TaskFilter(
       status: status ?? this.status,
@@ -31,6 +34,7 @@ class TaskFilter {
       maxAmount: maxAmount ?? this.maxAmount,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      skills: skills ?? this.skills,
       radiusKm: radiusKm ?? this.radiusKm,
     );
   }
@@ -43,6 +47,7 @@ class TaskFilter {
       'latitude': latitude,
       'longitude': longitude,
       'radius_km': radiusKm,
+      'skills': skills,
     };
   }
 
@@ -57,6 +62,7 @@ class TaskFilter {
       latitude: json['latitude']?.toDouble(),
       longitude: json['longitude']?.toDouble(),
       radiusKm: json['radius_km']?.toDouble(),
+      skills: json['skills'] != null ? List<String>.from(json['skills']) : null
     );
   }
 }

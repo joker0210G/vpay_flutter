@@ -1,11 +1,11 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vpay/app.dart';
+import 'package:vpay/features/auth/presentation/screens/sign_in_sign_up_screen.dart';
 import 'package:vpay/shared/config/supabase_config.dart';
 import 'package:vpay/shared/services/notification_service.dart';
-import 'package:vpay/shared/theme/app_theme.dart';
-import 'package:vpay/app.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,25 +16,12 @@ void main() async {
     anonKey: SupabaseConfig.anonKey,
   );
 
-  // Initialize Firebase
-  await Firebase.initializeApp();
-
   // Initialize Notification Service
   final notificationService = NotificationService(
-    messaging: FirebaseMessaging.instance,
     localNotifications: FlutterLocalNotificationsPlugin(),
   );
   await notificationService.initialize();
-
-  runApp(
-    ProviderScope(
-      overrides: [
-        // Provide the notification service
-        notificationServiceProvider.overrideWithValue(notificationService),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends ConsumerWidget {
@@ -50,7 +37,7 @@ class MyApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system, // Or use your theme provider
-      home: const VPayApp(),
+      home: const SignInSignUpScreen(),
     );
   }
 }
