@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vpay/shared/models/task_model.dart';
+import 'package:vpay/features/tasks/domain/task_filter.dart';
+import 'package:vpay/features/tasks/domain/task_status.dart';
 
 class TaskFilterDialog extends StatefulWidget {
   final TaskFilter? initialFilter;

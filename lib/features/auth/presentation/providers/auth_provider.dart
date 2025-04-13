@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:vpay/features/auth/data/auth_repository.dart';
+import 'package:vpay/features/auth/domain/auth_repository.dart';
 import 'package:vpay/shared/models/user_model.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
@@ -59,6 +59,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
       }
     }
   }
+
+  Future<void> signUpWithEmail({
+    required String email,
+    required String password,
+  }) async {
+      state = AuthState(isLoading: true);
+      try {
+        await signUp(email, password, "new user");
+      } catch (e) {
+           state = AuthState(isLoading: false, error: 'Error in register, please try again');
+      }
+    }
 
   Future<void> signOut() async {
     try {

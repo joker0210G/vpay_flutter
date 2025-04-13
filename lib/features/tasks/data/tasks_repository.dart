@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vpay/features/tasks/domain/task_status.dart';
 import 'package:vpay/shared/models/task_model.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:vpay/shared/services/analytics_service.dart';
 
 final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
   return TasksRepository(supabase: Supabase.instance.client);
@@ -38,14 +40,29 @@ class TasksRepository {
     return tasksInRadius;
   }
 
-  Future<TaskModel> createTask(TaskModel task) async {
+Future<TaskModel> createTask(TaskModel task) async {
     final response = await supabase
         .from('tasks')
         .insert(task.toJson())
         .select()
         .single();   
+    final newTask = TaskModel.fromMap(response);
+    await AnalyticsService.logEvent(
+          eventName: 'task_created',
+          parameters: {
+            'task_id': newTask.id,
+            'task_title': newTask.title,
+            'task_amount': newTask.amount,
+            'task_status': newTask.status.toString(),
+            'task_creator': newTask.creatorId
+          },
+        );
+    return newTask;
+  }
+
+// your code...
+}
     
-    return TaskModel.fromJson(response);
   }
 
   Future<TaskModel> updateTask(TaskModel task) async {

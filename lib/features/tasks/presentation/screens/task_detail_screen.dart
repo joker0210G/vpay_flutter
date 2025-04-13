@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:vpay/features/tasks/domain/task_status.dart';
 import 'package:vpay/features/tasks/presentation/providers/tasks_provider.dart';
 import 'package:vpay/shared/models/task_model.dart';
 import 'package:vpay/features/chat/presentation/screens/chat_screen.dart';
@@ -67,7 +68,7 @@ class TaskDetailScreen extends ConsumerWidget {
           ],
         ),
       ),
-      bottomNavigationBar: task.status == TaskStatus.open
+      bottomNavigationBar: task.status == TaskStatus.pending
           ? SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -77,7 +78,7 @@ class TaskDetailScreen extends ConsumerWidget {
                 ),
               ),
             )
-          : null,
+          : const SizedBox(),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           final currentUserId = ref.read(authProvider).user!.id;
@@ -144,10 +145,11 @@ class TaskDetailScreen extends ConsumerWidget {
                 amount: task.amount,
                 createdAt: task.createdAt,
                 deadline: task.deadline,
-                status: TaskStatus.inProgress,
+                status: TaskStatus.in_progress,
                 latitude: task.latitude,
                 longitude: task.longitude,
                 tags: task.tags,
+                skills: task.skills,
               );
 
               await ref.read(tasksProvider.notifier).updateTask(updatedTask);

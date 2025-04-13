@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vpay/features/tasks/presentation/providers/tasks_provider.dart';
 import 'package:vpay/shared/models/task_model.dart';
 import 'package:uuid/uuid.dart';
+import 'package:vpay/features/tasks/domain/task_status.dart';
 
 class CreateTaskScreen extends ConsumerStatefulWidget {
   const CreateTaskScreen({super.key});
@@ -135,7 +136,7 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
                               _isLoading = true;
                             });
                             try {
-                              final task = Task(
+                              final task = TaskModel(
                                 // ignore: prefer_const_constructors
                                 id: Uuid().v4(),
                                 title: _titleController.text,
@@ -146,7 +147,9 @@ class _CreateTaskScreenState extends ConsumerState<CreateTaskScreen> {
                                 createdAt: DateTime.now(),
                                 skills: _skills,
                                 latitude: 0,
-                                longitude: 0,
+                                longitude: 0,    
+                                status: TaskStatus.pending,
+                                tags: [],
                               );
                               await ref
                                   .read(tasksProvider.notifier)

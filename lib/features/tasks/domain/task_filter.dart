@@ -1,4 +1,4 @@
-import 'package:vpay/shared/models/task_model.dart';
+import 'package:vpay/features/tasks/domain/task_status.dart';
 
 class TaskFilter {
   final TaskStatus? status;

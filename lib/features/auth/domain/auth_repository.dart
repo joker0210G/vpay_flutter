@@ -61,5 +61,16 @@ class AuthRepository {
       return null;
     }
   }
-}
 
+  Future<void> sendPasswordResetEmail(String email) async {
+    await supabase.auth.resetPasswordForEmail(email);
+  }
+
+  Future<void> signInWithGoogle() async {
+    await supabase.auth.signInWithOAuth(OAuthProvider.google);
+  }
+
+  Future<void> signInWithFacebook() async {
+    await supabase.auth.signInWithOAuth(OAuthProvider.facebook);
+  }
+}

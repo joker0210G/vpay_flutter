@@ -6,6 +6,7 @@ import 'package:vpay/features/tasks/presentation/screens/create_task_screen.dart
 import 'package:vpay/features/tasks/presentation/widgets/task_filter_dialog.dart';
 import 'package:vpay/features/tasks/domain/task_filter.dart'; // Add this import
 import 'package:vpay/features/tasks/presentation/screens/task_detail_screen.dart'; // Add this import
+import 'package:vpay/features/tasks/domain/task_status.dart';
 
 class TaskListScreen extends ConsumerWidget {
   const TaskListScreen({super.key});
@@ -110,9 +111,9 @@ class TaskCard extends StatelessWidget {
 
   Color _getStatusColor(TaskStatus status) {
     switch (status) {
-      case TaskStatus.open:
+      case TaskStatus.pending:
         return Colors.green;
-      case TaskStatus.inProgress:
+      case TaskStatus.in_progress:
         return Colors.orange;
       case TaskStatus.completed:
         return Colors.blue;
