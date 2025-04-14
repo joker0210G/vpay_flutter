@@ -13,8 +13,9 @@ class AuthRepository {
 
   Future<void> signUp({
     required String email,
-    required String password,
     required String fullName,
+    required String password,
+    
   }) async {
     final response = await supabase.auth.signUp(
       email: email,

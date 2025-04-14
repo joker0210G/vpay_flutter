@@ -6,7 +6,8 @@ class AnalyticsService {
 
   AnalyticsService({required this.supabase});
 
-  Future<void> logEvent({required String eventName, Map<String, dynamic>? parameters}) async {
+  Future<void> logEvent(
+      {required String eventName, Map<String, dynamic>? parameters}) async {
     try {
       if (kDebugMode) {
         print('Analytics event: $eventName, parameters: $parameters');

@@ -1,18 +1,24 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:vpay/features/analytics/providers/analytics_service_provider.dart';
 import 'package:vpay/features/tasks/domain/task_status.dart';
 import 'package:vpay/shared/models/task_model.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:vpay/shared/services/analytics_service.dart';
 
 final tasksRepositoryProvider = Provider<TasksRepository>((ref) {
-  return TasksRepository(supabase: Supabase.instance.client);
+  return TasksRepository(
+    supabase: Supabase.instance.client,
+    analyticsService: ref.read(analyticsServiceProvider),
+  );
 });
 
 class TasksRepository {
   final SupabaseClient supabase;
+  final AnalyticsService analyticsService;
 
-  TasksRepository({required this.supabase});
+  TasksRepository({required this.supabase, required this.analyticsService});
+  
 
   Future<List<TaskModel>> getTasks() async {
     final response = await supabase
@@ -23,7 +29,7 @@ class TasksRepository {
 
   Future<List<TaskModel>> getTasksInRadius(
       double latitude, double longitude, double radius) async {
-    final distance = Distance();
+    const distance = Distance();
     final List<TaskModel> allTasks = await getTasks();
     final List<TaskModel> tasksInRadius = [];
     for (final task in allTasks) {
@@ -40,14 +46,14 @@ class TasksRepository {
     return tasksInRadius;
   }
 
-Future<TaskModel> createTask(TaskModel task) async {
+  Future<TaskModel> createTask(TaskModel task) async {
     final response = await supabase
         .from('tasks')
         .insert(task.toJson())
         .select()
         .single();   
-    final newTask = TaskModel.fromMap(response);
-    await AnalyticsService.logEvent(
+    final newTask = TaskModel.fromJson(response);
+    await analyticsService.logEvent(
           eventName: 'task_created',
           parameters: {
             'task_id': newTask.id,
@@ -58,12 +64,7 @@ Future<TaskModel> createTask(TaskModel task) async {
           },
         );
     return newTask;
-  }
-
-// your code...
-}
-    
-  }
+  }  
 
   Future<TaskModel> updateTask(TaskModel task) async {
     final response = await supabase

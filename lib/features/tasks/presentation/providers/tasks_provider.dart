@@ -2,7 +2,6 @@ import 'dart:async'; // Add this import for StreamSubscription
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vpay/features/tasks/data/tasks_repository.dart';
 import 'package:vpay/shared/models/task_model.dart';
-import 'package:vpay/shared/services/analytics_service.dart';
 import 'package:vpay/features/tasks/domain/task_filter.dart'; // Add this import
 
 final tasksProvider = StateNotifierProvider<TasksNotifier, TasksState>((ref) {
@@ -62,14 +61,6 @@ class TasksNotifier extends StateNotifier<TasksState> {
       state = state.copyWith(
         tasks: [newTask, ...state.tasks],
         isLoading: false,
-      );
-      AnalyticsService().logEvent(
-        eventName: 'create_task',
-        parameters: {
-          'task_title': task.title,
-          'task_amount': task.amount,
-          'task_skills': task.skills,
-        },
       );
     } catch (e) {
       state = state.copyWith(
