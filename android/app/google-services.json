@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "371562210642",
+    "project_id": "vpay-7",
+    "storage_bucket": "vpay-7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:371562210642:android:3a546f4125c7a37a35868b",
+        "android_client_info": {
+          "package_name": "dev.vpay.vpay_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA9L8pn_1XfNu0iOvioOqHcnlYJtCHWYwQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
