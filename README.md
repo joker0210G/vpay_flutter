@@ -233,3 +233,74 @@ Enterprise Solutions: Business accounts, bulk task posting, verified business st
 Advanced Tech: AI task matching, automated scheduling, voice commands, task insurance.  
 
 Monetization Expansion: Business subscriptions, verification badges, urgent task fees, insurance, data insights, API access, white-labeling.
+
+Primary Brand Colors:
+
+Primary: #001C3C
+Primary Dark: #001428
+Primary Light: #002B5C
+Secondary Brand Colors:
+
+Secondary: #50EDFE
+Secondary Dark: #00D6E9
+Secondary Light: #7FF4FF
+Accent Colors:
+
+Accent: #2F89FC
+Accent Dark: #1877F2
+Link Blue: #2F89FC
+Status Colors:
+
+Success: #00C853
+Warning: #FFB300
+Error: #FF3D00
+Info: #2196F3
+Light Theme Colors:
+
+Background: #F8F9FA
+Surface: #FFFFFF (white)
+Text Primary: #1A1A1A
+Text Secondary: #757575
+Divider: #E0E0E0
+Dark Theme Colors:
+
+Background: #121212
+Surface: #1E1E1E
+Text Primary: #FFFFFF (white)
+Text Secondary: #B3B3B3
+Divider: #323232
+Opacity Colors (Black):
+
+Black 05: #0D000000
+Black 10: #1A000000
+Black 20: #33000000
+Black 50: #80000000
+Black 70: #B3000000
+Black 80: #CC000000
+Opacity Colors (White):
+
+White 05: #0DFFFFFF
+White 10: #1AFFFFFF
+White 20: #33FFFFFF
+White 50: #80FFFFFF
+White 70: #B3FFFFFF
+White 80: #CCFFFFFF
+
+
+
+
+
+App Blueprint
+Authentication — Email/Password (Supabase Auth), Social Login (UI present), Biometric (local_auth), Password Reset, Planned: Student ID Verification.
+Task Management — Task Model (Open, InProgress, Completed, Cancelled), TasksRepository (Supabase), tasksProvider (Riverpod), UI (task_list, create_task, task_detail), Categories defined.
+Payments — Payment Model (Pending, Processing, Completed, Failed), PaymentRepository (upi_india - placeholder UPI ID), paymentProvider (Riverpod), UI (payment_screen), Potential: Razorpay, Stripe.
+Chat & Communication — ChatMessage Model, ChatRepository (Supabase), chatProvider (Riverpod - family), UI (flutter_chat_ui).
+Notifications — Notification Model, NotificationRepository (Supabase), NotificationService (Firebase Messaging, local notifications), notificationProvider (Riverpod), UI (notification_screen).
+User Profiles — UserModel, Profile data via AuthRepository/Supabase 'profiles' table, UI mentioned (profile_screen).
+Location Services — maps_flutter, geolocator/geocoding mentioned.
+Color
+9+
+Layout
+Planning to use MediaQuery, LayoutBuilder, flutter_screenutil.
+Typography
+Fonts: Poppins, Righteous (configured in pubspec.yaml).
